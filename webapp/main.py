@@ -7,6 +7,14 @@ from fastapi import FastAPI
 from sqlalchemy import Column, Connection, Engine, Integer, MetaData, Row, Sequence, Table, Text, Tuple, create_engine, insert, select, text
 
 app = FastAPI()
+metadata: MetaData = MetaData()
+urls = Table(
+        'urls',
+        metadata,
+        Column("shorturl", Text, nullable=False, primary_key=True),
+        Column("longurl", Text, nullable=False),
+        Column("interactions", Integer),
+    )
 
 @app.get("/new/") 
 async def shortenURL(longurl: str):
@@ -14,13 +22,20 @@ async def shortenURL(longurl: str):
     #Pretty sure this should be a PUT or POST
     #Add success/fails
 
-    shorturl: str = uuid.uuid4().hex[0:6] #probably should do it better than this! placeholder
     longurl = urllib.parse.unquote(longurl) #maybe unneeded
 
     engine: Engine = create_engine("postgresql+psycopg2://postgres:postgres@db:5432/pynyurl")
     conn: Connection = engine.connect()
-    
+    shorturl: str = ''
+    res: int = -1
+    while(res != 0):
+        shorturl = uuid.uuid4().hex[0:7] #probably should do it better than this! placeholder
+        query: Text = text("SELECT COUNT(longurl) FROM urls WHERE shorturl = '%s'" % (shorturl))
+        res = conn.execute(query).fetchone()[0]
+        conn.commit()
+
     query: Text = text("INSERT INTO urls (longurl, shorturl) VALUES ('%s','%s');" % (longurl, shorturl))
+
     conn.execute(query)
     conn.commit()
     conn.close()
@@ -33,14 +48,6 @@ async def redirect_user(shorturl: str):
     #Add success/fails
     engine: Engine = create_engine("postgresql+psycopg2://postgres:postgres@db:5432/pynyurl")
     conn: Connection = engine.connect()
-    metadata: MetaData = MetaData()
-    urls = Table(
-        'urls',
-        metadata,
-        Column("shorturl", Text, nullable=False, primary_key=True),
-        Column("longurl", Text, nullable=False),
-        Column("interactions", Integer),
-    )
 
     query = select(
         urls.columns.longurl
