@@ -1,29 +1,67 @@
+from typing import Any
 import uuid
+from fastapi.responses import HTMLResponse
 import uvicorn
 import urllib.parse
 from fastapi import FastAPI
-from sqlalchemy import Connection, Engine, Text, create_engine, insert, text
+from sqlalchemy import Column, Connection, Engine, Integer, MetaData, Row, Sequence, Table, Text, Tuple, create_engine, insert, select, text
 
 app = FastAPI()
 
-@app.get("/")
-def read_root(): #Hello World!
-    return {"Hello": "World"}
+@app.get("/new/") 
+async def shortenURL(longurl: str):
+    #This will generate a shortened URL from a URL that a user delivers to it
+    #Pretty sure this should be a PUT or POST
+    #Add success/fails
 
-
-@app.get("/new/") #This will generate a shortened URL from a URL that a user delivers to it
-def shortenURL(longURL: str):
-
-    shortURL: str = uuid.uuid4().hex[0:6] #probably should do it better than this! placeholder
-    longURL = urllib.parse.unquote(longURL) #maybe unneeded
+    shorturl: str = uuid.uuid4().hex[0:6] #probably should do it better than this! placeholder
+    longurl = urllib.parse.unquote(longurl) #maybe unneeded
 
     engine: Engine = create_engine("postgresql+psycopg2://postgres:postgres@db:5432/pynyurl")
     conn: Connection = engine.connect()
-    query: Text = text("INSERT INTO urls (longURL, shortURL) VALUES ('" + longURL +"'), ('"+shortURL+"');")
+    
+    query: Text = text("INSERT INTO urls (longurl, shorturl) VALUES ('%s','%s');" % (longurl, shorturl))
     conn.execute(query)
     conn.commit()
+    conn.close()
 
-    return {"shortURL": shortURL, "longURL": longURL}
+    return {"shorturl": shorturl, "longurl": longurl}
+
+@app.get("/use/{shorturl}", response_class=HTMLResponse)
+async def redirect_user(shorturl: str):
+    #Redirect the user to the long URL from the short URL
+    #Add success/fails
+    engine: Engine = create_engine("postgresql+psycopg2://postgres:postgres@db:5432/pynyurl")
+    conn: Connection = engine.connect()
+    metadata: MetaData = MetaData()
+    urls = Table(
+        'urls',
+        metadata,
+        Column("shorturl", Text, nullable=False, primary_key=True),
+        Column("longurl", Text, nullable=False),
+        Column("interactions", Integer),
+    )
+
+    query = select(
+        urls.columns.longurl
+    ).where(
+        urls.columns.shorturl == shorturl
+    )
+
+    res: Row[Tuple[Any]] = conn.execute(query).fetchone()
+    conn.close()
+
+    return """
+    <html>
+        <body>
+            <script>
+                    setTimeout(function(){
+                        window.location.href = '%s';
+                    }, 10);
+            </script>
+        </body>
+    </html>
+    """ % res[0]
 
 if __name__ == "__main__":
    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
