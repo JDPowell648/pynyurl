@@ -17,9 +17,9 @@ def shortenURL(longURL: str):
     shortURL: str = uuid.uuid4().hex[0:6] #probably should do it better than this! placeholder
     longURL = urllib.parse.unquote(longURL) #maybe unneeded
 
-    engine: Engine = create_engine("postgresql+psycopg2://postgres:postgres@db:5432/DB")
+    engine: Engine = create_engine("postgresql+psycopg2://postgres:postgres@db:5432/pynyurl")
     conn: Connection = engine.connect()
-    query: Text = text("INSERT INTO urls (longURL, shortURL) VALUES (${longURL}), (${shortURL});")
+    query: Text = text("INSERT INTO urls (longURL, shortURL) VALUES ('" + longURL +"'), ('"+shortURL+"');")
     conn.execute(query)
     conn.commit()
 
