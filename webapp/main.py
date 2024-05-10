@@ -87,7 +87,8 @@ async def shortenURL(longurl: str):
 @app.get("/use/{shorturl}", response_class=HTMLResponse)
 async def redirect_user(shorturl: str):
     # This function will redirect the user to the long URL from the short URL
-    # Add success/fails
+    # It will also update the amount of interactions the short URL has had since creation
+
     engine: Engine = create_engine(
         "postgresql+psycopg2://%s:%s@%s:%s/%s"
         % (
@@ -103,6 +104,17 @@ async def redirect_user(shorturl: str):
     query = select(urls.columns.longurl).where(urls.columns.shorturl == shorturl)
 
     res: Row[Tuple[Any]] = conn.execute(query).fetchone()
+
+    if(res is None):
+        return (
+        """
+        <html>
+            <body>
+                Oops! This short URL does not exist or has been lost to space and time.
+            </body>
+        </html>
+        """
+        )
 
     query = update(urls).where(urls.columns.shorturl == shorturl).values(interactions = urls.columns.interactions + 1)
     conn.execute(query)
