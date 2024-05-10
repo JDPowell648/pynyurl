@@ -5,6 +5,6 @@ GRANT ALL PRIVILEGES ON DATABASE pynyurl TO postgres;
 CREATE TABLE urls (
     shorturl text NOT NULL,
     longurl text NOT NULL,
-    interactions int,
+    interactions int DEFAULT 0,
     PRIMARY KEY (shorturl)
 );

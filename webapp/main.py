@@ -3,7 +3,6 @@ import uuid
 import uvicorn
 import urllib.parse
 import os
-from dotenv import load_dotenv, find_dotenv
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from sqlalchemy import (
@@ -21,6 +20,8 @@ from sqlalchemy import (
     insert,
     select,
     text,
+    update,
+    values,
 )
 
 POSTGRES_DB_NAME = os.environ["POSTGRES_DB_NAME"]
@@ -44,9 +45,8 @@ urls = Table(
 
 @app.get("/new/")
 async def shortenURL(longurl: str):
-    # This will generate a shortened URL from a URL that a user delivers to it
-    # Pretty sure this should be a PUT or POST
-    # Add success/fails
+    # This function will generate a shortened URL from a URL that a user delivers to it.
+    # The new URL will be 7 characters long and random. There should be no duplicates entries.
 
     longurl = urllib.parse.unquote(longurl)  # maybe unneeded
 
@@ -86,7 +86,7 @@ async def shortenURL(longurl: str):
 
 @app.get("/use/{shorturl}", response_class=HTMLResponse)
 async def redirect_user(shorturl: str):
-    # Redirect the user to the long URL from the short URL
+    # This function will redirect the user to the long URL from the short URL
     # Add success/fails
     engine: Engine = create_engine(
         "postgresql+psycopg2://%s:%s@%s:%s/%s"
@@ -103,6 +103,10 @@ async def redirect_user(shorturl: str):
     query = select(urls.columns.longurl).where(urls.columns.shorturl == shorturl)
 
     res: Row[Tuple[Any]] = conn.execute(query).fetchone()
+
+    query = update(urls).where(urls.columns.shorturl == shorturl).values(interactions = urls.columns.interactions + 1)
+    conn.execute(query)
+
     conn.close()
 
     return (

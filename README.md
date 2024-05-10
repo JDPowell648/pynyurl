@@ -6,8 +6,8 @@ PYnyURL takes a user's URL and shortens it down to 7 characters. Then, the user 
 
 ## How Do I Build This Project?
 To build this project, run `docker compose up --build` in your terminal of choice. This will create the associated images for the postgres database and the api.
-Y
-ou can hit the API at `host/new?longurl=MY/URL/HERE` to create a shortened URL of 7 characters.
+
+You can hit the API at `host/new?longurl=MY/URL/HERE` to create a shortened URL of 7 characters.
 
 Then, you are able to use this shortened URL at `host/use/MYSHORTURL`
 
@@ -15,3 +15,6 @@ Then, you are able to use this shortened URL at `host/use/MYSHORTURL`
 Be sure to create a .env file with the following variables to run the project:
 
 POSTGRES_DB_NAME, POSTGRES_DB_USER, POSTGRES_DB_PASS, POSTGRES_DB_HOST, POSTGRES_DB_PORT, APP_HOST, APP_PORT
+
+## Future Plans
+I would to create unit tests for this project, but they are currently on the back burner.
