@@ -8,7 +8,6 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from sqlalchemy import Column, Connection, Engine, Integer, MetaData, Row, Sequence, Table, Text, Tuple, create_engine, insert, select, text
 
-load_dotenv(find_dotenv(filename='.env', raise_error_if_not_found=True, usecwd=False))
 POSTGRES_DB_NAME=os.environ.get("POSTGRES_DB_NAME")
 POSTGRES_DB_USER=os.environ.get("POSTGRES_DB_USER")
 POSTGRES_DB_PASS=os.environ.get("POSTGRES_DB_PASS")
