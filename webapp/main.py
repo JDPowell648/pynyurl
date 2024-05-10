@@ -8,13 +8,13 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from sqlalchemy import Column, Connection, Engine, Integer, MetaData, Row, Sequence, Table, Text, Tuple, create_engine, insert, select, text
 
-POSTGRES_DB_NAME=os.environ.get("POSTGRES_DB_NAME")
-POSTGRES_DB_USER=os.environ.get("POSTGRES_DB_USER")
-POSTGRES_DB_PASS=os.environ.get("POSTGRES_DB_PASS")
-POSTGRES_DB_HOST=os.environ.get("POSTGRES_DB_HOST")
-POSTGRES_DB_PORT=os.environ.get("POSTGRES_DB_PORT")
-APP_HOST=os.environ.get("APP_HOST")
-APP_PORT=os.environ.get("APP_PORT")
+POSTGRES_DB_NAME=os.environ['POSTGRES_DB_NAME']
+POSTGRES_DB_USER=os.environ['POSTGRES_DB_USER']
+POSTGRES_DB_PASS=os.environ['POSTGRES_DB_PASS']
+POSTGRES_DB_HOST=os.environ['POSTGRES_DB_HOST']
+POSTGRES_DB_PORT=os.environ['POSTGRES_DB_PORT']
+APP_HOST=os.environ['APP_HOST']
+APP_PORT=os.environ['APP_PORT']
 
 app = FastAPI()
 metadata: MetaData = MetaData()
