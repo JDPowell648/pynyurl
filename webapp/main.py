@@ -56,7 +56,7 @@ async def shortenURL(longurl: str):
 async def redirect_user(shorturl: str):
     #Redirect the user to the long URL from the short URL
     #Add success/fails
-    engine: Engine = create_engine("postgresql+psycopg2://postgres:postgres@db:5432/pynyurl")
+    engine: Engine = create_engine("postgresql+psycopg2://%s:%s@%s:%s/%s" % (POSTGRES_DB_USER, POSTGRES_DB_PASS, POSTGRES_DB_HOST, POSTGRES_DB_PORT, POSTGRES_DB_NAME))
     conn: Connection = engine.connect()
 
     query = select(
