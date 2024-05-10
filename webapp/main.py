@@ -66,7 +66,7 @@ async def shortenURL(longurl: str):
     while res != 0:
         shorturl = uuid.uuid4().hex[
             0:7
-        ]  # probably should do it better than this! placeholder
+        ] 
         query: Text = text(
             "SELECT COUNT(longurl) FROM urls WHERE shorturl = '%s'" % (shorturl)
         )
@@ -120,7 +120,7 @@ async def redirect_user(shorturl: str):
         .values(interactions=urls.columns.interactions + 1)
     )
     conn.execute(query)
-
+    conn.commit()
     conn.close()
 
     return (
