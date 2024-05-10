@@ -105,18 +105,20 @@ async def redirect_user(shorturl: str):
 
     res: Row[Tuple[Any]] = conn.execute(query).fetchone()
 
-    if(res is None):
-        return (
-        """
+    if res is None:
+        return """
         <html>
             <body>
                 Oops! This short URL does not exist or has been lost to space and time.
             </body>
         </html>
         """
-        )
 
-    query = update(urls).where(urls.columns.shorturl == shorturl).values(interactions = urls.columns.interactions + 1)
+    query = (
+        update(urls)
+        .where(urls.columns.shorturl == shorturl)
+        .values(interactions=urls.columns.interactions + 1)
+    )
     conn.execute(query)
 
     conn.close()
